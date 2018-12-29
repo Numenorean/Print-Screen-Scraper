@@ -58,7 +58,7 @@ def download():
             final_url = get_url()
             r = requests.get(final_url, headers = random_headers())
             if r.status_code == 200:
-                with open('C:/Users/Dima/AppData/Local/Programs/Python/Python37/PrintScreenScraper/Screen/'+random_name()+'.jpg', 'wb') as f:
+                with open('PATH TO SAVE SCREENSHOTS'+random_name()+'.jpg', 'wb') as f:
                     f.write(r.content)
                     print('[Success] Url: '+final_url)
         except:
