@@ -2,6 +2,9 @@ import requests
 import random
 from bs4 import BeautifulSoup
 import string
+import sys
+import os
+from time import sleep
 
 logo = '''
  _____      _       _       _____                              _____                                   _                     _____ _    _ _ _     
@@ -12,8 +15,8 @@ logo = '''
 |_|   |_|  |_|_| |_|\__|  |_____/ \___|_|  \___|\___|_| |_|  |_____/ \___|_|  \__,_| .__/ \___|_|     |_.__/ \__, |        |_____/|_|\_\_|_|_|    
                                                                                    | |                        __/ |    ______              ______ 
                                                                                    |_|                       |___/    |______|            |______|'''              
-
 print(logo)
+
 
 desktop_agents = ['Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
                  'Mozilla/5.0 (Windows NT 10.0; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/54.0.2840.99 Safari/537.36',
@@ -32,19 +35,18 @@ def random_url():
     return ''.join(random.choice(string.ascii_lowercase + string.digits) for m in range(3))
 
 def random_name():
-    return ''.join(random.choice(string.ascii_letters) for m in range(10))
+    return ''.join(random.choice(string.ascii_letters) for m in range(15))
 
 def url(new):
     base_url = 'https://prnt.sc/'+new
     url = base_url+random_url()
     return url
 
-def get_html():
-    r = requests.get(url(new), headers = random_headers())
+def get_html(final_url):
+    r = requests.get(final_url, headers = random_headers())
     return r.content
 
-def get_url():
-    html = get_html()
+def get_url(html):
     soup = BeautifulSoup(html, 'lxml')
     url_photo = soup.find('div', {'class':'image-container image__pic js-image-pic'}).find('img').get('src')
     if url_photo == '//st.prntscr.com/2018/10/13/2048/img/0_173a7b_211be8ff.png':
@@ -52,17 +54,31 @@ def get_url():
     else:
         return url_photo
 
-def download():
-    while True:
-        try:
-            final_url = get_url()
-            r = requests.get(final_url, headers = random_headers())
-            if r.status_code == 200:
-                with open('PATH TO SAVE SCREENSHOTS'+random_name()+'.jpg', 'wb') as f:
-                    f.write(r.content)
-                    print('[Success] Url: '+final_url)
-        except:
-            print('[Error] None Photo')
+def download(path, url_photo, n):
+    try:
+        r = requests.get(url_photo, headers = random_headers())
+        if r.status_code == 200:
+            with open(path+random_name()+'.jpg', 'wb') as f:
+                f.write(r.content)
+                print('['+str(n)+']'+'[Success] Url: '+url_photo)
+                sleep(0.01)
+    except:
+        print('[Error] Non image')
+        sleep(0.01)
+
+def main():
+    n = 1
+    new = input('\nFirst three characters in url: ')
+    path = input('Path to save: ')
+    number = int(input('Number of pictures: '))
+    for i in range(number):
+        final_url = url(new)
+        html = get_html(final_url)
+        url_photo = get_url(html)
+        path = os.path.abspath(r''.join(path)).replace('\\', '/')+'/'
+        download(path, url_photo, n)
+        n += 1
+    print('Completed')
+    input()
 if __name__=='__main__':
-    new = input('\n\nFirst three characters: ')
-    download()
+    main()
